@@ -5,79 +5,143 @@
 <title>Case Opening</title>
 
 <style>
-  body {
-    font-family: Arial;
-    background: #0f0f0f;
-    color: white;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    height: 100vh;
-  }
+body {
+  margin: 0;
+  font-family: Arial;
+  background: #0b0b0b;
+  color: white;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  height: 100vh;
+}
 
-  .case {
-    width: 220px;
-    height: 220px;
-    border: 3px solid white;
-    border-radius: 12px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 1.5rem;
-    margin-bottom: 20px;
-    background: #1c1c1c;
-  }
+/* Titel */
+h1 {
+  color: #00ffd5;
+  margin-bottom: 20px;
+}
 
-  button {
-    padding: 10px 20px;
-    cursor: pointer;
-    font-size: 16px;
-  }
+/* Fönster (det du ser) */
+.window {
+  width: 320px;
+  overflow: hidden;
+  border: 2px solid #333;
+  border-radius: 10px;
+  position: relative;
+}
 
-  .rarity-common { color: #bbb; }
-  .rarity-rare { color: #4da3ff; }
-  .rarity-epic { color: #b84dff; }
-  .rarity-legendary { color: gold; }
+/* Marker (mitten där item landar) */
+.marker {
+  position: absolute;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: red;
+  transform: translateX(-50%);
+}
+
+/* Raden som rullar */
+.track {
+  display: flex;
+  width: max-content;
+  transition: transform 4s cubic-bezier(.1,.8,.2,1);
+}
+
+/* Items */
+.item {
+  width: 100px;
+  height: 100px;
+  margin: 10px;
+  background: #1c1c1c;
+  border-radius: 10px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 14px;
+  border: 1px solid #333;
+}
+
+/* Rarity colors */
+.common { color: #aaa; }
+.rare { color: #4da3ff; }
+.epic { color: #b84dff; }
+.legendary { color: gold; }
+
+button {
+  margin-top: 20px;
+  padding: 10px 20px;
+  border: none;
+  background: #00ffd5;
+  font-weight: bold;
+  cursor: pointer;
+  border-radius: 8px;
+}
+
+button:hover {
+  transform: scale(1.05);
+}
 </style>
 </head>
 
 <body>
 
-<h1>Case Opening</h1>
+<h1>CASE OPENING</h1>
 
-<div class="case" id="caseBox">Tryck öppna</div>
-<button onclick="openCase()">Öppna case</button>
+<div class="window">
+  <div class="marker"></div>
+  <div class="track" id="track"></div>
+</div>
+
+<button onclick="spin()">Open Case</button>
 
 <script>
 const items = [
-  { name: "Iron Sword", rarity: "common" },
-  { name: "Wood Shield", rarity: "common" },
-  { name: "Magic Ring", rarity: "rare" },
-  { name: "Dragon Helm", rarity: "epic" },
-  { name: "God Blade", rarity: "legendary" }
+  { name: "Iron", rarity: "common" },
+  { name: "Stone", rarity: "common" },
+  { name: "Bow", rarity: "rare" },
+  { name: "Staff", rarity: "epic" },
+  { name: "DRAGON SWORD", rarity: "legendary" }
 ];
 
-// Viktad RNG (så legendaries är ovanliga)
-function getRandomItem() {
-  const roll = Math.random() * 100;
+const track = document.getElementById("track");
 
-  if (roll < 60) return items[0]; // common
-  if (roll < 80) return items[2]; // rare
-  if (roll < 95) return items[3]; // epic
-  return items[4]; // legendary
+function createItems() {
+  track.innerHTML = "";
+
+  // skapa massa items (så det ser ut som CS roll)
+  for (let i = 0; i < 25; i++) {
+    const item = items[Math.floor(Math.random() * items.length)];
+
+    const div = document.createElement("div");
+    div.className = "item " + item.rarity;
+    div.textContent = item.name;
+
+    track.appendChild(div);
+  }
 }
 
-function openCase() {
-  const box = document.getElementById("caseBox");
-  box.textContent = "Öppnar...";
+function spin() {
+  createItems();
 
-  setTimeout(() => {
-    const item = getRandomItem();
-    box.textContent = item.name;
-    box.className = "case rarity-" + item.rarity;
-  }, 1000);
+  // reset position
+  track.style.transition = "none";
+  track.style.transform = "translateX(0px)";
+
+  // force reflow
+  void track.offsetWidth;
+
+  track.style.transition = "transform 4s cubic-bezier(.1,.8,.2,1)";
+
+  // slumpmässig “landning”
+  const randomOffset = -(Math.floor(Math.random() * 10) + 10) * 120;
+
+  track.style.transform = `translateX(${randomOffset}px)`;
 }
+
+createItems();
 </script>
 
 </body>
