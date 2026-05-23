@@ -8,7 +8,7 @@
 body {
   margin: 0;
   font-family: Arial;
-  background: #0b0b0b;
+  background: radial-gradient(circle at top, #1a1a1a, #000);
   color: white;
   display: flex;
   flex-direction: column;
@@ -21,63 +21,77 @@ body {
 h1 {
   color: #00ffd5;
   margin-bottom: 20px;
+  text-shadow: 0 0 10px #00ffd5;
 }
 
-/* Fönster (det du ser) */
+/* RESULT TEXT */
+.result {
+  margin-top: 20px;
+  font-size: 1.5rem;
+  color: gold;
+  text-shadow: 0 0 10px gold;
+  height: 30px;
+}
+
+/* WINDOW (större nu) */
 .window {
-  width: 320px;
+  width: 90%;
+  max-width: 600px;
+  height: 140px;
   overflow: hidden;
   border: 2px solid #333;
-  border-radius: 10px;
+  border-radius: 12px;
   position: relative;
+  background: #111;
 }
 
-/* Marker (mitten där item landar) */
+/* center marker */
 .marker {
   position: absolute;
   left: 50%;
   top: 0;
   bottom: 0;
-  width: 2px;
+  width: 3px;
   background: red;
   transform: translateX(-50%);
+  z-index: 2;
 }
 
-/* Raden som rullar */
+/* track */
 .track {
   display: flex;
   width: max-content;
   transition: transform 4s cubic-bezier(.1,.8,.2,1);
 }
 
-/* Items */
+/* item */
 .item {
-  width: 100px;
-  height: 100px;
+  width: 120px;
+  height: 120px;
   margin: 10px;
-  background: #1c1c1c;
   border-radius: 10px;
+  background: #1c1c1c;
   display: flex;
   align-items: center;
   justify-content: center;
-  font-size: 14px;
   border: 1px solid #333;
+  font-size: 14px;
 }
 
-/* Rarity colors */
+/* rarities */
 .common { color: #aaa; }
 .rare { color: #4da3ff; }
 .epic { color: #b84dff; }
 .legendary { color: gold; }
 
 button {
-  margin-top: 20px;
-  padding: 10px 20px;
+  margin-top: 25px;
+  padding: 12px 25px;
   border: none;
   background: #00ffd5;
   font-weight: bold;
   cursor: pointer;
-  border-radius: 8px;
+  border-radius: 10px;
 }
 
 button:hover {
@@ -95,24 +109,26 @@ button:hover {
   <div class="track" id="track"></div>
 </div>
 
-<button onclick="spin()">Open Case</button>
+<button onclick="spin()">Öppna Case</button>
+
+<div class="result" id="resultText"></div>
 
 <script>
 const items = [
-  { name: "Iron", rarity: "common" },
-  { name: "Stone", rarity: "common" },
-  { name: "Bow", rarity: "rare" },
-  { name: "Staff", rarity: "epic" },
-  { name: "DRAGON SWORD", rarity: "legendary" }
+  { name: "Iron Sword", rarity: "common" },
+  { name: "Wood Shield", rarity: "common" },
+  { name: "Magic Bow", rarity: "rare" },
+  { name: "Wizard Staff", rarity: "epic" },
+  { name: "DRAGON BLADE", rarity: "legendary" }
 ];
 
 const track = document.getElementById("track");
+const resultText = document.getElementById("resultText");
 
 function createItems() {
   track.innerHTML = "";
 
-  // skapa massa items (så det ser ut som CS roll)
-  for (let i = 0; i < 25; i++) {
+  for (let i = 0; i < 30; i++) {
     const item = items[Math.floor(Math.random() * items.length)];
 
     const div = document.createElement("div");
@@ -124,21 +140,22 @@ function createItems() {
 }
 
 function spin() {
+  resultText.textContent = "";
   createItems();
 
-  // reset position
   track.style.transition = "none";
   track.style.transform = "translateX(0px)";
-
-  // force reflow
   void track.offsetWidth;
-
   track.style.transition = "transform 4s cubic-bezier(.1,.8,.2,1)";
 
-  // slumpmässig “landning”
-  const randomOffset = -(Math.floor(Math.random() * 10) + 10) * 120;
+  const offset = -(Math.floor(Math.random() * 10) + 15) * 130;
+  track.style.transform = `translateX(${offset}px)`;
 
-  track.style.transform = `translateX(${randomOffset}px)`;
+  // visa resultat efter spin
+  setTimeout(() => {
+    const landed = items[Math.floor(Math.random() * items.length)];
+    resultText.textContent = `Du fick: ${landed.name}`;
+  }, 4200);
 }
 
 createItems();
